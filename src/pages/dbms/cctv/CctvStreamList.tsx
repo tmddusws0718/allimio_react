@@ -1,43 +1,41 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AdminToolbar, DataTable, PageHeader, DbmsPagination, ConfirmDeleteModal, type DataTableColumn } from '../../../components/ui';
 import { axiosInstance } from '../../../utils/Tool.ts';
 import {
   PAGE_SIZE,
-  STATE_LABELS,
-  STATE_BADGE,
+  CONN_STATE_LABELS,
+  CONN_STATE_BADGE,
   EMPTY_FILTERS,
-  type CctvSearchResult,
+  type CctvStreamSearchResult,
   type RowType,
   type Filters,
-} from '../../../components/ts/CctvAdmin.ts';
+} from '../../../components/ts/CctvStream.ts';
 
 // 파일이름 꼭 맞춰주세요
 /* ---------------------------------------------------------------------
-   CCTV관리(/dbms/cctv) - 관리자 목록. sno(매장) 상관없이 전체 CCTV를 대상으로 합니다.
+   CCTV 스트림 관리(/dbms/cctvstream) - 관리자 전용.
 
-   CCTV 컬럼: no/sno/mac/represent/cname/ckdate/state/cdate
-   - CCTV 등록/수정/삭제는 관리자 전용입니다. 사용자(user/shop/CctvList.tsx)는
-     로그인 후 입장한 매장 소유 CCTV를 조회만 할 수 있습니다.
-   - 맨 앞 "번호" 컬럼은 실제 PK(no)가 아니라, 검색 결과 총 건수 기준으로
-     내림차순 매긴 가상의 순번(cnt)입니다. (ShopList.tsx/CctvIssueList.tsx와 동일 패턴)
+   CCTV_STREAM 컬럼: no/cno/streamUrl/protocol/port/connState/lastConnectedAt/cdate
+   - CCTV(장비 메타데이터) 자체에는 스트림 접속 주소 컬럼이 없어서(cctv-ai-pipeline-design.md
+     "확인/보완이 필요한 것" 1번) 이 화면에서 CCTV별 스트림 연결정보를 따로 등록/관리합니다.
+   - CCTV 1대당 스트림 1건(cno UNIQUE). Jetson 워커가 접속/재접속에 성공할 때마다
+     connState/lastConnectedAt이 갱신되는 걸 전제로 합니다(연결상태 모니터링 용도).
 
-   API (CctvCont, /cctv)
-   GET    /cctv/admin/search?sno=&state=&keyword=&page=&size=  - 전체 CCTV 검색 + 페이징
-     → { content, totalElements, totalPages, page(0-base), size }
-   DELETE /cctv/{pk}
-
-   상수/타입(PAGE_SIZE, STATE_LABELS, STATE_BADGE, Filters, EMPTY_FILTERS, RowType)은
-   전부 ./CctvAdmin.ts 로 옮겨뒀습니다.
+   API (CctvStreamCont, /cctv_stream)
+   GET    /cctv_stream/search?cno=&connState=&keyword=&page=&size=  - 검색 + 페이징
+   DELETE /cctv_stream/{pk}
 --------------------------------------------------------------------- */
 
-export default function CctvListView() {
+export default function CctvStreamListView() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // CCTV관리(CctvList.tsx)에서 "스트림" 버튼으로 들어오면 ?cno= 쿼리로 해당 CCTV만 미리 필터링
+  const initialFilters: Filters = { ...EMPTY_FILTERS, cno: searchParams.get('cno') ?? '' };
 
-  // draft: 입력 중인 값 (타이핑만으로는 검색 안 됨) / applied: "검색" 눌렀을 때 실제 조회에 쓰이는 값
-  const [draft, setDraft] = useState<Filters>(EMPTY_FILTERS);
-  const [applied, setApplied] = useState<Filters>(EMPTY_FILTERS);
-  const [page, setPage] = useState(1); // 화면 표시는 1부터, 서버는 0부터
+  const [draft, setDraft] = useState<Filters>(initialFilters);
+  const [applied, setApplied] = useState<Filters>(initialFilters);
+  const [page, setPage] = useState(1);
 
   const [rows, setRows] = useState<RowType[]>([]);
   const [totalElements, setTotalElements] = useState(0);
@@ -50,12 +48,12 @@ export default function CctvListView() {
   const loadList = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get<CctvSearchResult>('/cctv/admin/search', {
+      const res = await axiosInstance.get<CctvStreamSearchResult>('/cctv_stream/search', {
         params: {
           page: page - 1,
           size: PAGE_SIZE,
-          sno: applied.sno.trim() !== '' ? Number(applied.sno.trim()) : undefined,
-          state: applied.state !== '' ? Number(applied.state) : undefined,
+          cno: applied.cno.trim() !== '' ? Number(applied.cno.trim()) : undefined,
+          connState: applied.connState !== '' ? Number(applied.connState) : undefined,
           keyword: applied.keyword.trim() || undefined,
         },
       });
@@ -101,9 +99,8 @@ export default function CctvListView() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await axiosInstance.delete(`/cctv/${deleteTarget.no}`);
+      await axiosInstance.delete(`/cctv_stream/${deleteTarget.no}`);
       setDeleteTarget(null);
-      // 마지막 페이지의 마지막 1건을 지운 경우 빈 페이지가 보이지 않도록 보정
       if (rows.length === 1 && page > 1) {
         setPage(page - 1);
       } else {
@@ -119,93 +116,67 @@ export default function CctvListView() {
 
   const columns: DataTableColumn<RowType>[] = [
     { header: '번호', width: '64px', mono: true, render: (r) => r.cnt },
-    { header: '매장번호', width: '90px', mono: true, render: (r) => `#${r.sno}` },
+    { header: 'CCTV번호', width: '90px', mono: true, render: (r) => `#${r.cno}` },
     {
-      header: 'CCTV명',
-      width: '18%',
+      header: '스트림 주소',
+      width: '28%',
       render: (r) => (
         <div>
-          <div className="cell_title">{r.cname || '(이름 없음)'}</div>
-          <div className="cell_sub">No.{r.no}</div>
+          <div className="cell_title mono">{r.streamUrl || '(미등록)'}</div>
+          <div className="cell_sub">{r.protocol}{r.port ? `:${r.port}` : ''}</div>
         </div>
       ),
     },
-    { header: 'MAC 주소', width: '160px', mono: true, render: (r) => r.mac || '-' },
     {
-      header: '대표',
-      width: '70px',
+      header: '연결상태',
+      width: '100px',
       render: (r) => (
-        <span className={`badge ${r.represent === 'Y' ? 'badge_info' : 'badge_neutral'}`}>
-          {r.represent === 'Y' ? '대표' : '-'}
+        <span className={`badge ${CONN_STATE_BADGE[r.connState ?? 0] ?? 'badge_neutral'}`}>
+          {CONN_STATE_LABELS[r.connState ?? 0] ?? r.connState}
         </span>
       ),
     },
-    {
-      header: '상태',
-      width: '90px',
-      render: (r) => (
-        <span className={`badge ${STATE_BADGE[r.state ?? 0] ?? 'badge_neutral'}`}>
-          {STATE_LABELS[r.state ?? 0] ?? r.state}
-        </span>
-      ),
-    },
-    { header: '최근 점검일', width: '110px', mono: true, render: (r) => r.ckdate || '-' },
+    { header: '최근 연결일시', width: '160px', mono: true, render: (r) => r.lastConnectedAt || '-' },
     { header: '등록일', width: '110px', mono: true, render: (r) => r.cdate },
-    {
-      header: '스트림',
-      width: '90px',
-      render: (r) => (
-        <button
-          type="button"
-          className="btn btn_sm btn_ghost"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/dbms/cctvstream?cno=${r.no}`);
-          }}
-        >
-          연결정보
-        </button>
-      ),
-    },
   ];
 
   return (
     <section className="view active">
       <PageHeader
-        title="CCTV관리"
-        description="전체 매장의 CCTV 장비를 등록·수정·삭제합니다. (CCTV 테이블 기준, sno 상관없이 전체 대상)"
-        createLabel="+ CCTV 등록"
+        title="CCTV 스트림 관리"
+        description="CCTV별 실시간 영상 스트림 접속 정보와 연결상태입니다. Jetson 워커가 접속에 성공할 때마다 연결상태가 갱신됩니다."
+        createLabel="+ 스트림 등록"
         onCreate={() => navigate('new')}
       />
 
       <AdminToolbar
         searchValue={draft.keyword}
         onSearchChange={(value) => setDraft((prev) => ({ ...prev, keyword: value }))}
-        searchPlaceholder="CCTV명·MAC주소로 검색"
+        searchPlaceholder="스트림 주소로 검색"
         onSearchEnter={onSearch}
         filters={
           <>
             <input
               type="number"
               className="form_input"
-              placeholder="매장번호"
-              value={draft.sno}
-              onChange={(e) => setDraft((prev) => ({ ...prev, sno: e.target.value }))}
+              placeholder="CCTV번호"
+              value={draft.cno}
+              onChange={(e) => setDraft((prev) => ({ ...prev, cno: e.target.value }))}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') onSearch();
               }}
               style={{ maxWidth: 110 }}
-              aria-label="매장번호 필터"
+              aria-label="CCTV번호 필터"
             />
 
             <select
               className="form_select"
-              value={draft.state}
-              onChange={(e) => setDraft((prev) => ({ ...prev, state: e.target.value }))}
-              aria-label="상태 필터"
+              value={draft.connState}
+              onChange={(e) => setDraft((prev) => ({ ...prev, connState: e.target.value }))}
+              aria-label="연결상태 필터"
             >
-              <option value="">상태 전체</option>
-              {Object.entries(STATE_LABELS).map(([state, label]) => (
+              <option value="">연결상태 전체</option>
+              {Object.entries(CONN_STATE_LABELS).map(([state, label]) => (
                 <option key={state} value={state}>
                   {label}
                 </option>
@@ -232,7 +203,7 @@ export default function CctvListView() {
         loading={loading}
         onEdit={(r) => navigate(`${r.no}/edit`)}
         onDelete={(r) => setDeleteTarget(r)}
-        emptyMessage="등록된 CCTV가 없습니다."
+        emptyMessage="등록된 스트림 연결정보가 없습니다."
       />
 
       <DbmsPagination page={page} totalPages={totalPages} totalCount={totalElements} pageSize={PAGE_SIZE} onChange={setPage} />
@@ -241,7 +212,7 @@ export default function CctvListView() {
         open={deleteTarget !== null}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        targetLabel={deleteTarget ? `No.${deleteTarget.no} · ${deleteTarget.cname || '(이름 없음)'} (매장 #${deleteTarget.sno})` : undefined}
+        targetLabel={deleteTarget ? `No.${deleteTarget.no} · CCTV #${deleteTarget.cno}` : undefined}
         loading={deleting}
       />
     </section>

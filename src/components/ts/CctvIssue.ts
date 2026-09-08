@@ -33,22 +33,17 @@ export interface CctvIssueSearchResult {
 /* ---------------------------------------------------------------------
    CctvIssueList.tsx에서 쓰는 상수/타입.
 
-   ⚠️ CODE(문제유형코드)/STATE(오탐여부) 값 체계는 참조 테이블이 없어서
-     SentinelEye 5대 이상행동(폭행/기물파손/쓰러짐·응급/무단침입/장시간체류) 기준으로
-     임시 매핑해뒀습니다. 실제 코드값이 다르면 아래 CODE_LABELS/STATE_LABELS만
-     고치면 됩니다 (매핑에 없는 값은 원본 코드/숫자를 그대로 보여주므로 깨지지 않음).
+   문제유형코드(CODE)는 이제 CCTV_ISSUE_CODE 참조 테이블로 관리합니다
+   (관리자 화면: dbms/cctv/CctvIssueCodeList.tsx). 예전에 여기 있던 CODE_LABELS
+   하드코딩(01~05)은 제거했고, 화면에서는 src/hooks/useCctvIssueCodes.ts 훅으로
+   GET /cctv_issue_code/list를 조회해서 코드→라벨 매핑을 만듭니다.
+   (매핑에 없는 값은 원본 코드를 그대로 보여주므로 깨지지 않음 - useCctvIssueCodes의 codeLabel 참고)
+
+   ⚠️ STATE(오탐여부) 값 체계는 아직 참조 테이블이 없어서 처리 상태 워크플로우
+     기준으로 임시 매핑해뒀습니다. 실제 코드값이 다르면 아래 STATE_LABELS만 고치면 됩니다.
 --------------------------------------------------------------------- */
 
 export const PAGE_SIZE = 10;
-
-// 문제유형코드(CODE) - VARCHAR2(2) 라서 2자리 코드로 가정
-export const CODE_LABELS: Record<string, string> = {
-  '01': '폭행',
-  '02': '기물파손',
-  '03': '쓰러짐/응급',
-  '04': '무단침입',
-  '05': '장시간체류',
-};
 
 // 오탐여부(STATE) - NUMBER(3,0), 처리 상태 워크플로우로 가정
 export const STATE_LABELS: Record<number, string> = {

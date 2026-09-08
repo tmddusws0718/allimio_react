@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { AdminToolbar, AttachViewer, DataTable, PageHeader, DbmsPagination, type DataTableColumn } from '../../../components/ui';
 import { axiosInstance } from '../../../utils/Tool.ts';
+import { useCctvIssueCodes } from '../../../hooks/useCctvIssueCodes.ts';
 import {
   PAGE_SIZE,
-  CODE_LABELS,
   STATE_LABELS,
   STATE_BADGE,
   EMPTY_FILTERS,
@@ -26,12 +26,15 @@ import {
    GET /cctv_issue/search?cno=&code=&state=&noticeyn=&keyword=&cdateFrom=&cdateTo=&page=&size=
      → { content, totalElements, totalPages, page(0-base), size }
 
-   상수/타입(PAGE_SIZE, CODE_LABELS, STATE_LABELS, STATE_BADGE, RowType, Filters,
-   EMPTY_FILTERS)은 전부 ./CctvIssue.ts 로 옮겨뒀습니다. CODE/STATE 값 매핑을
-   바꿔야 하면 이 파일이 아니라 CctvIssue.ts를 고치면 됩니다.
+   상수/타입(PAGE_SIZE, STATE_LABELS, STATE_BADGE, RowType, Filters, EMPTY_FILTERS)은
+   전부 ./CctvIssue.ts 로 옮겨뒀습니다. 문제유형코드(CODE) 라벨은 CCTV_ISSUE_CODE
+   테이블 기준으로 useCctvIssueCodes 훅에서 가져옵니다(코드 자체를 추가/수정하려면
+   dbms/cctv/CctvIssueCodeList.tsx 관리 화면에서 하면 됩니다).
 --------------------------------------------------------------------- */
 
 export default function CctvIssueListView() {
+  const { codes, codeLabel } = useCctvIssueCodes();
+
   // draft: 입력 중인 값 (타이핑만으로는 검색 안 됨) / applied: "검색" 눌렀을 때 실제 조회에 쓰이는 값
   const [draft, setDraft] = useState<Filters>(EMPTY_FILTERS);
   const [applied, setApplied] = useState<Filters>(EMPTY_FILTERS);
@@ -111,7 +114,7 @@ export default function CctvIssueListView() {
     {
       header: '문제유형',
       width: '110px',
-      render: (r) => <span className="badge badge_info">{CODE_LABELS[r.code] ?? r.code}</span>,
+      render: (r) => <span className="badge badge_info">{codeLabel(r.code)}</span>,
     },
     {
       header: '오탐여부',
@@ -178,9 +181,9 @@ export default function CctvIssueListView() {
               aria-label="문제유형 필터"
             >
               <option value="">유형 전체</option>
-              {Object.entries(CODE_LABELS).map(([code, label]) => (
-                <option key={code} value={code}>
-                  {label}
+              {codes.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.codeName}
                 </option>
               ))}
             </select>
@@ -300,7 +303,7 @@ export default function CctvIssueListView() {
                 </div>
                 <div>
                   <div className="clabel">AI 감지 신뢰도</div>
-                  <div className="ctype">{CODE_LABELS[renderDetail.code] ?? renderDetail.code}</div>
+                  <div className="ctype">{codeLabel(renderDetail.code)}</div>
                 </div>
               </div>
 

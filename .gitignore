@@ -29,3 +29,4 @@ dist-ssr
 **/Tool.ts
 vite.config.ts
 src/utils/Tool.ts
+vite.config.ts

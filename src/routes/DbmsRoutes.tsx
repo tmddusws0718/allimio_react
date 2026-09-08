@@ -11,6 +11,10 @@ import CctvIssueList from '../pages/dbms/cctv/CctvIssueList';
 import CctvVisitorList from '../pages/dbms/cctv/CctvVisitorList';
 import CctvList from '../pages/dbms/cctv/CctvList';
 import CctvForm from '../pages/dbms/cctv/CctvForm';
+import CctvIssueCodeList from '../pages/dbms/cctv/CctvIssueCodeList';
+import CctvIssueCodeForm from '../pages/dbms/cctv/CctvIssueCodeForm';
+import CctvStreamList from '../pages/dbms/cctv/CctvStreamList';
+import CctvStreamForm from '../pages/dbms/cctv/CctvStreamForm';
 import SurveyForm from '../pages/dbms/survey/SurveyForm';
 import SurveyList from '../pages/dbms/survey/SurveyList';
 import SurveyResponseList from '../pages/dbms/survey/SurveyResponseList';
@@ -33,6 +37,7 @@ import AttachList from '../pages/dbms/attach/AttachList';
 import ShopPlanForm from '../pages/dbms/shopplan/ShopPlanForm';
 import ShopPlanList from '../pages/dbms/shopplan/ShopPlanList';
 
+import NotificationAdmin from '../pages/dbms/notification/NotificationAdmin';
 
 export default function DbmsRoutes() {
   return (
@@ -62,7 +67,7 @@ export default function DbmsRoutes() {
 
       <Route path="shopmenu" element={<ShopMenuList />} />
       <Route path="shopmenu/new" element={<ShopMenuForm />} />
-      <Route path="shopmenu/:no/edit" element={<ShopMenuForm />} />      
+      <Route path="shopmenu/:no/edit" element={<ShopMenuForm />} />
 
       <Route path="shop" element={<ShopList />} />
       <Route path="shop/:no/edit" element={<ShopForm />} />
@@ -73,23 +78,36 @@ export default function DbmsRoutes() {
       <Route path="cctv" element={<CctvList />} />
       <Route path="cctv/new" element={<CctvForm />} />
       <Route path="cctv/:no/edit" element={<CctvForm />} />
-      
-      
-      <Route path="survey" element={<SurveyList />}/>
+
+      {/* 이상행동유형코드 관리 (CCTV_ISSUE_CODE) */}
+      <Route path="cctvissuecode" element={<CctvIssueCodeList />} />
+      <Route path="cctvissuecode/new" element={<CctvIssueCodeForm />} />
+      <Route path="cctvissuecode/:code/edit" element={<CctvIssueCodeForm />} />
+
+      {/* CCTV 스트림 연결정보 관리 (CCTV_STREAM) */}
+      <Route path="cctvstream" element={<CctvStreamList />} />
+      <Route path="cctvstream/new" element={<CctvStreamForm />} />
+      <Route path="cctvstream/:no/edit" element={<CctvStreamForm />} />
+
+
+      <Route path="survey" element={<SurveyList />} />
       <Route path="survey/create" element={<SurveyForm />} />
       <Route path="survey/:no/edit" element={<SurveyForm />} />
-      <Route path="survey/:no/responses" element={<SurveyResponseList />}/>
+      <Route path="survey/:no/responses" element={<SurveyResponseList />} />
 
       <Route path="shopmap" element={<ShopMapList />} />
 
       <Route path="login" element={<DbmsLogin />} />{/* 관리자 로그인 */}
       <Route path="memberlist" element={<MemberList />} />
-      <Route path="memberlist/:role/:no" element = {<MemberDetail />} />
-      <Route path="history/update" element = {<UpdateHistory />} />
-      <Route path="history/login" element = {<LoginHistory />} />
-      
+      <Route path="memberlist/:role/:no" element={<MemberDetail />} />
+      <Route path="history/update" element={<UpdateHistory />} />
+      <Route path="history/login" element={<LoginHistory />} />
+
       <Route path="mypage" element={<MyPage />} />
       <Route path="mypage/change-password" element={<ChangePassword />} />
+
+      {/* 관리자 알림 조회*/}
+      <Route path="notification" element={<NotificationAdmin />} />
     </Routes>
   );
 }

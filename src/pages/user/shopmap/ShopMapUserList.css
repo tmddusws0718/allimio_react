@@ -11,47 +11,105 @@
 
 .shopmap_row {
   display: grid;
-  grid-template-columns: minmax(220px, 1.4fr) 100px minmax(220px, 1fr) 220px;
+
+  grid-template-columns:
+    minmax(220px, 1.4fr) 100px minmax(220px, 1fr) 260px;
+
   gap: 20px;
   align-items: center;
+
   min-height: 82px;
+
   padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
+
+  border-bottom:
+    1px solid var(--border);
 }
 
 .shopmap_row:last-child {
   border-bottom: 0;
 }
 
-/* 매장명과 주소 */
+
+/* =========================================
+   매장명 / 주소
+========================================= */
+
 .shopmap_store {
   min-width: 0;
 }
 
-/* 도면 등록 상태 */
+
+/* =========================================
+   도면 등록 상태
+========================================= */
+
 .shopmap_status {
   display: flex;
   align-items: center;
 }
 
-/* 등록된 도면 파일명 */
+
+/* =========================================
+   등록된 도면 파일 정보
+========================================= */
+
 .shopmap_file {
   min-width: 0;
 }
 
 .shopmap_file .cell_title {
   overflow: hidden;
+
   text-overflow: ellipsis;
+
   white-space: nowrap;
 }
 
-/* 보기 / 변경 */
+
+/* =========================================
+   보기 / 변경 / 삭제
+========================================= */
+
 .shopmap_actions {
   display: flex;
+
   justify-content: flex-end;
+
+  align-items: center;
+
   gap: 6px;
+
   flex-wrap: wrap;
 }
+
+
+/* =========================================
+   도면 삭제 버튼
+========================================= */
+
+.btn_delete {
+  border:
+    1px solid #ef4444;
+
+  background:
+    transparent;
+
+  color:
+    #ef4444;
+}
+
+.btn_delete:hover:not(:disabled) {
+  background:
+    rgba(239, 68, 68, 0.08);
+}
+
+.btn_delete:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
 
 /* =========================================
    등록 / 변경 / 보기 모달
@@ -59,108 +117,200 @@
 
 .shopmap_modal_backdrop {
   position: fixed;
+
   inset: 0;
+
   z-index: 1000;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   padding: 24px;
-  background: rgba(15, 23, 42, 0.48);
+
+  background:
+    rgba(15, 23, 42, 0.48);
 }
 
 .shopmap_modal {
   display: flex;
+
   flex-direction: column;
+
   width: 100%;
+
   max-width: 700px;
-  max-height: calc(100vh - 48px);
+
+  max-height:
+    calc(100vh - 48px);
+
   overflow: hidden;
+
   border-radius: 12px;
-  background: var(--surface);
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+
+  background:
+    var(--surface);
+
+  box-shadow:
+    0 20px 60px rgba(15, 23, 42, 0.18);
 }
 
-/* 모달 상단 */
+
+/* =========================================
+   모달 상단
+========================================= */
+
 .shopmap_modal_header {
   display: flex;
+
   flex-shrink: 0;
+
   align-items: flex-start;
+
   justify-content: space-between;
+
   gap: 20px;
+
   padding: 20px 22px;
-  border-bottom: 1px solid var(--border);
+
+  border-bottom:
+    1px solid var(--border);
 }
 
 .shopmap_modal_header h3 {
-  margin: 0 0 5px;
+  margin:
+    0 0 5px;
+
   font-size: 18px;
+
   font-weight: 700;
-  color: var(--text);
+
+  color:
+    var(--text);
 }
 
 .shopmap_modal_header p {
   margin: 0;
+
   font-size: 13px;
-  color: var(--text-faint);
+
+  color:
+    var(--text-faint);
 }
 
 .shopmap_modal_close {
   width: 32px;
+
   height: 32px;
+
   padding: 0;
+
   border: 0;
+
   border-radius: 6px;
-  background: transparent;
-  color: var(--text-dim);
+
+  background:
+    transparent;
+
+  color:
+    var(--text-dim);
+
   font-size: 24px;
+
   line-height: 1;
+
   cursor: pointer;
 }
 
 .shopmap_modal_close:hover {
-  background: var(--surface-2);
+  background:
+    var(--surface-2);
 }
 
-/* 모달 내용 */
+.shopmap_modal_close:disabled {
+  opacity: 0.5;
+
+  cursor:
+    not-allowed;
+}
+
+
+/* =========================================
+   모달 내용
+========================================= */
+
 .shopmap_modal_body {
   flex: 1;
+
   min-height: 0;
+
   padding: 20px 22px;
+
   overflow-y: auto;
 }
 
 .shopmap_upload_info {
   display: flex;
+
   flex-direction: column;
+
   gap: 4px;
+
   margin-bottom: 18px;
 }
 
 .shopmap_upload .form_label {
   display: block;
+
   margin-bottom: 8px;
 }
 
-/* 파일 용량 안내 */
+
+/* =========================================
+   파일 용량 안내
+========================================= */
+
 .shopmap_file_help {
   margin-left: 8px;
-  color: var(--text-faint);
+
+  color:
+    var(--text-faint);
+
   font-size: 12px;
+
   font-weight: 400;
 }
 
-/* 파일 선택 */
+
+/* =========================================
+   파일 선택
+========================================= */
+
 .shopmap_file_input {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
   gap: 12px;
+
   min-height: 42px;
+
   padding-left: 14px;
+
   overflow: hidden;
-  border: 1px solid var(--border);
+
+  border:
+    1px solid var(--border);
+
   border-radius: 8px;
-  background: var(--surface);
+
+  background:
+    var(--surface);
+
   cursor: pointer;
 }
 
@@ -170,65 +320,119 @@
 
 .shopmap_file_input span {
   min-width: 0;
+
   overflow: hidden;
-  color: var(--text-faint);
+
+  color:
+    var(--text-faint);
+
   font-size: 13px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
 }
 
 .shopmap_file_input strong {
   align-self: stretch;
+
   display: flex;
+
   flex-shrink: 0;
+
   align-items: center;
+
   padding: 0 16px;
-  border-left: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--text);
+
+  border-left:
+    1px solid var(--border);
+
+  background:
+    var(--surface-2);
+
+  color:
+    var(--text);
+
   font-size: 12px;
+
   font-weight: 600;
 }
 
-/* 선택한 도면 또는 기존 도면 미리보기 */
+
+/* =========================================
+   선택한 도면 / 기존 도면 미리보기
+========================================= */
+
 .shopmap_preview {
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   min-height: 200px;
+
   max-height: 360px;
+
   margin-top: 16px;
+
   overflow: auto;
-  border: 1px solid var(--border);
+
+  border:
+    1px solid var(--border);
+
   border-radius: 8px;
-  background: var(--surface-2);
+
+  background:
+    var(--surface-2);
 }
 
 .shopmap_preview img {
   display: block;
+
   max-width: 100%;
+
   max-height: 340px;
+
   object-fit: contain;
 }
 
 .shopmap_preview p,
 .shopmap_empty {
   margin: 0;
+
   padding: 28px 20px;
-  color: var(--text-faint);
+
+  color:
+    var(--text-faint);
+
   font-size: 13px;
+
   text-align: center;
 }
 
-/* 모달 하단 */
+
+/* =========================================
+   모달 하단
+========================================= */
+
 .shopmap_modal_footer {
   display: flex;
+
   flex-shrink: 0;
+
   justify-content: flex-end;
+
   gap: 8px;
+
   padding: 16px 22px;
-  border-top: 1px solid var(--border);
+
+  border-top:
+    1px solid var(--border);
 }
+
 
 /* =========================================
    등록된 도면 보기 모달
@@ -240,14 +444,18 @@
 
 .shopmap_view_preview {
   min-height: 350px;
+
   max-height: 60vh;
 }
 
 .shopmap_view_preview img {
   max-width: 100%;
+
   max-height: 55vh;
+
   object-fit: contain;
 }
+
 
 /* =========================================
    작은 화면
@@ -256,11 +464,13 @@
 @media (max-width: 900px) {
   .shopmap_row {
     grid-template-columns: 1fr;
+
     gap: 10px;
   }
 
   .shopmap_actions {
-    justify-content: flex-start;
+    justify-content:
+      flex-start;
   }
 
   .shopmap_modal {
@@ -274,13 +484,15 @@
   }
 
   .shopmap_modal {
-    max-height: calc(100vh - 24px);
+    max-height:
+      calc(100vh - 24px);
   }
 
   .shopmap_modal_header,
   .shopmap_modal_body,
   .shopmap_modal_footer {
     padding-left: 16px;
+
     padding-right: 16px;
   }
 
@@ -290,6 +502,8 @@
 
   .shopmap_file_help {
     display: block;
-    margin: 4px 0 0;
+
+    margin:
+      4px 0 0;
   }
 }
