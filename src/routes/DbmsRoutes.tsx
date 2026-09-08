@@ -37,6 +37,7 @@ import AttachList from '../pages/dbms/attach/AttachList';
 import ShopPlanForm from '../pages/dbms/shopplan/ShopPlanForm';
 import ShopPlanList from '../pages/dbms/shopplan/ShopPlanList';
 
+import NotificationAdmin from '../pages/dbms/notification/NotificationAdmin';
 
 export default function DbmsRoutes() {
   return (
@@ -66,7 +67,7 @@ export default function DbmsRoutes() {
 
       <Route path="shopmenu" element={<ShopMenuList />} />
       <Route path="shopmenu/new" element={<ShopMenuForm />} />
-      <Route path="shopmenu/:no/edit" element={<ShopMenuForm />} />      
+      <Route path="shopmenu/:no/edit" element={<ShopMenuForm />} />
 
       <Route path="shop" element={<ShopList />} />
       <Route path="shop/:no/edit" element={<ShopForm />} />
@@ -87,23 +88,26 @@ export default function DbmsRoutes() {
       <Route path="cctvstream" element={<CctvStreamList />} />
       <Route path="cctvstream/new" element={<CctvStreamForm />} />
       <Route path="cctvstream/:no/edit" element={<CctvStreamForm />} />
-      
-      
-      <Route path="survey" element={<SurveyList />}/>
+
+
+      <Route path="survey" element={<SurveyList />} />
       <Route path="survey/create" element={<SurveyForm />} />
       <Route path="survey/:no/edit" element={<SurveyForm />} />
-      <Route path="survey/:no/responses" element={<SurveyResponseList />}/>
+      <Route path="survey/:no/responses" element={<SurveyResponseList />} />
 
       <Route path="shopmap" element={<ShopMapList />} />
 
       <Route path="login" element={<DbmsLogin />} />{/* 관리자 로그인 */}
       <Route path="memberlist" element={<MemberList />} />
-      <Route path="memberlist/:role/:no" element = {<MemberDetail />} />
-      <Route path="history/update" element = {<UpdateHistory />} />
-      <Route path="history/login" element = {<LoginHistory />} />
-      
+      <Route path="memberlist/:role/:no" element={<MemberDetail />} />
+      <Route path="history/update" element={<UpdateHistory />} />
+      <Route path="history/login" element={<LoginHistory />} />
+
       <Route path="mypage" element={<MyPage />} />
       <Route path="mypage/change-password" element={<ChangePassword />} />
+
+      {/* 관리자 알림 조회*/}
+      <Route path="notification" element={<NotificationAdmin />} />
     </Routes>
   );
 }
