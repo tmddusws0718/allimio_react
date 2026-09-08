@@ -15,8 +15,9 @@ import { usePaging } from '../../../hooks/usePaging';
 export default function ShopPaymentDetail() {
   const navigate = useNavigate();
   const { pno, ono } = useParams<{ pno: string; ono: string }>();
+  const url = location.pathname.includes('/order') ? 'order' : 'shoporder';
 
-  const { goToList } = usePaging({ basePath: `/user/shoporder/${ono}/payment` });
+  const { goToList } = usePaging({ basePath: `/user/${url}/${ono}/payment` });
   const [payment, setPayment] = useState<ShopPaymentTypes | null>(null);
   const [loading, setLoading] = useState(true);
 

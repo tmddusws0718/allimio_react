@@ -52,7 +52,7 @@ export default function DataTable<T>({
       <table className="table">
         <colgroup>
           {columns.map((col) => (
-            <col key={col.header} style={col.width ? { width: col.width } : undefined} />
+            <col key={col.header} style={data.length > 0 && col.width ? { width: col.width } : undefined} />
           ))}
           {hasActions && <col />}
         </colgroup>

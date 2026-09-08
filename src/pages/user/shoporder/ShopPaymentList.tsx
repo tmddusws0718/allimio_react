@@ -35,7 +35,8 @@ export default function ShopPaymentList() {
   const { no: mno } = GlobalStoreSession();
   const { ono } = useParams<{ ono: string }>();
 
-  const { page, setPage, navigateWithQuery } = usePaging({ basePath: `/user/shoporder/${ono}/payment` });
+  const url = location.pathname.includes('/order') ? 'order' : 'shoporder';
+  const { page, setPage, navigateWithQuery } = usePaging({ basePath: `/user/${url}/${ono}/payment` });
 
   const [payments, setPayments] = useState<RowType[]>([]);
   const [refund, setRefund] = useState<Record<string, ShopRefundTypes>>({});

@@ -23,6 +23,11 @@
   padding:14px 18px;margin-bottom:18px;border-width:1px;
   animation:pulseBg 1.8s ease-in-out infinite;
 }
+.alert_mode .alert_banner.info{
+  background:linear-gradient(90deg, rgba(77, 249, 255, 0.16), rgba(255,77,94,0.05));
+  border:1px solid rgba(77, 228, 255, 0.4);
+  animation:none;
+}
 @keyframes pulseBg{0%,100%{background:linear-gradient(90deg, rgba(255,77,94,0.16), rgba(255,77,94,0.05));}50%{background:linear-gradient(90deg, rgba(255,77,94,0.28), rgba(255,77,94,0.08));}}
 
 /* 여러 곳(REC 점, LIVE 뱃지 등)에서 참조만 하고 정의가 빠져있던 keyframes.
@@ -32,12 +37,20 @@
   width:36px;height:36px;border-radius:8px;background:var(--red-500);color:#1a0508;
   display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;
 }
+.alert_banner.info .aicon{
+  background:var(--primary);
+}
 .alert_banner .atext{flex:1;min-width:0;}
 .alert_banner .atext .t1{font-size:14px;font-weight:700;color:#fff;}
 .alert_banner .atext .t2{font-size:12px;color:#F4B8BD;margin-top:2px;}
+.alert_banner.info .atext .t2{color:#b8f4db;}
 .alert_banner .abtn{
   background:var(--red-500);color:#fff;border:none;padding:9px 16px;border-radius:7px;
   font-size:12.5px;font-weight:700;white-space:nowrap;
+}
+.alert_banner.info .abtn{
+  background:var(--primary);
+  color:var(--n-800);
 }
 
 /* =========================================================
@@ -455,9 +468,16 @@ body.alert_mode .sim_toggle .dot{background:var(--red-500);animation:blink 1s in
 
 /* .order_top {display:grid; grid-template-columns: minmax(150px, 1fr) minmax(0, 1fr); gap:14px;} */
 .order_top {display:flex; gap:14px;}
-.order_top .card {flex: 1 auto}
 .order_top .actions {display:flex; flex-direction: column;}
-
+.order_top .card {
+  flex: 1 auto;
+  transition: border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+  cursor: pointer;
+}
+.order_top .card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
 
 
 

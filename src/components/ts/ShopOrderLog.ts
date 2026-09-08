@@ -1,14 +1,3 @@
-// NO           NUMBER(10)                  NOT NULL, -- 로그 고유번호 (PK)
-// ORDERNO      VARCHAR2(30)                NOT NULL, -- 구독 내역 번호 (FK)
-// MNO          NUMBER(10)                  NOT NULL, -- 회원번호
-// ACTION       NUMBER(1)                   NOT NULL, -- 이벤트 종류 (0 결제 / 1 매장연결 / 2 갱신 / 3 취소)
-// SNO          NUMBER(7)                       NULL, -- 관련 매장번호 (매장연결일 때만)
-// BEFORE_EDATE VARCHAR2(30)                    NULL, -- 변경 전 종료일 (갱신일 때)
-// AFTER_EDATE  VARCHAR2(30)                    NULL, -- 변경 후 종료일
-// AMOUNT       NUMBER(12)                      NULL, -- 관련 금액 (결제액/환불액)
-// MEMO         VARCHAR2(500)                   NULL, -- 부가 설명
-// CDATE        VARCHAR2(30)                NOT NULL, -- 발생일시
-
 export interface ShopOrderLogTypes {
   no: number;
   ono: string;
@@ -22,7 +11,6 @@ export interface ShopOrderLogTypes {
   cdate: string;
 }
 
-/** 목록에 표시할 때 전체 건수 기준 순번(cnt)을 붙인 행 타입 (ShopOrderList.tsx와 동일 패턴) */
 export type RowType = ShopOrderLogTypes & { cnt: number };
 
 // ACTION (이벤트 종류)

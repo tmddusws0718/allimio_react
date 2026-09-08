@@ -10,8 +10,9 @@ import { DataTable, Filterbar, UserPagination, type DataTableColumn } from "../.
 export default function ShopOrderLog() {
   const { no: mno } = GlobalStoreSession();
   const { ono } = useParams<{ ono: string }>();
+  const url = location.pathname.includes('/order') ? 'order' : 'shoporder';
 
-  const { page, setPage, navigateWithQuery } = usePaging({ basePath: `/user/shoporder/${ono}/history` });
+  const { page, setPage, navigateWithQuery } = usePaging({ basePath: `/user/${url}/${ono}/history` });
 
   const [logs, setLogs] = useState<RowType[]>([]);
   const [loading, setLoading] = useState(true);

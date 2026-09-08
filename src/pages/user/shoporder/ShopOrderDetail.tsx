@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { PageHeader } from '../../../components/ui';
 import { axiosInstance } from '../../../utils/Tool';
-import { ORDER_STATUS_MAP, type ShopOrderTypes } from '../../../components/ts/ShopOrder';
+import { isExpired, ORDER_STATUS_MAP, type ShopOrderTypes } from '../../../components/ts/ShopOrder';
 import { GlobalStoreSession } from '../../../store/LoginStore';
 
 /* ---------------------------------------------------------------------
@@ -29,14 +29,16 @@ export default function ShopOrderDetail() {
   const { ono } = useParams<{ ono: string }>();
   const [searchParams] = useSearchParams();
   const listPage = searchParams.get('listPage') ?? '1';
+  
+  const url = location.pathname.includes('/order') ? 'order' : 'shoporder';
 
   const goToTab = (tKey: TabKey) => {
-    const path = tKey === 'info' ? `/user/shoporder/${ono}` : `/user/shoporder/${ono}/${tKey}`;
+    const path = tKey === 'info' ? `/user/${url}/${ono}` : `/user/${url}/${ono}/${tKey}`;
     navigate(`${path}?listPage=${listPage}`);
   };
 
   // "목록으로" 버튼 — listPage를 다시 page로 되돌려서 목록의 usePaging이 인식하게 함
-  const backToList = () => navigate(`/user/shoporder?page=${listPage}`);
+  const backToList = () => navigate(`/user/${url}?page=${listPage}`);
 
   // 현재 URL 기준으로 활성 탭 판단
   const currentTab: TabKey = location.pathname.includes('/payment')
@@ -104,7 +106,9 @@ export default function ShopOrderDetail() {
     <section className="view active">
       <PageHeader
         title="구독 내역 상세"
-        description={`주문번호 ${order.no}에 대한 상세 구독 내역을 확인할 수 있습니다.`}
+        description={
+          `${url === 'order' ? `${order.sname}에서 구독 중 인 ` : ''}주문번호 ${order.no}에 대한 상세 구독 내역을 확인할 수 있습니다.`
+        }
         actions={
           <button type="button" className="btn btn_md btn_ghost" onClick={backToList}>
             ← 목록으로
@@ -138,8 +142,8 @@ export default function ShopOrderDetail() {
             <div className="flex both top" style={{ marginBottom: 16 }}>
               <h3 className="title">{order.pname}</h3>
 
-              <span className={`badge ${ORDER_STATUS_MAP[order.status].className}`}>
-                {ORDER_STATUS_MAP[order.status].label}
+              <span className={`badge ${ORDER_STATUS_MAP[isExpired(order.edate) ? 3 : order.status].className}`}>
+                {ORDER_STATUS_MAP[isExpired(order.edate) ? 3 : order.status].label}
               </span>
             </div>
 
@@ -191,7 +195,7 @@ export default function ShopOrderDetail() {
               연결된 매장
             </div>
             {order.sno ? (
-              <div className="mono" style={{ fontSize: 15 }}>
+              <div>
                 {order.sname}
               </div>
             ) : order.status === 3 ? (
@@ -202,7 +206,7 @@ export default function ShopOrderDetail() {
                 <button
                   type="button"
                   className="btn btn_md btn_primary"
-                  onClick={() => navigate(`/user/shoporder/${ono}/match`)}
+                  onClick={() => navigate(`/user/${url}/${ono}/match`)}
                 >
                   + 매장 연결
                 </button>

@@ -40,7 +40,7 @@ import ShopPaymentList from '../pages/user/shoporder/ShopPaymentList';
 import ShopPaymentDetail from '../pages/user/shoporder/ShopPaymentDetail';
 import ShopRefundDetail from '../pages/user/shoporder/ShopRefundDetail';
 import ShopOrderLog from '../pages/user/shoporder/ShopOrderLog';
-import ShopOrder from '../pages/user/shop/ShopOrder';
+import ShopOrder from '../pages/user/shop/ShopOrderList';
 import ShopOrderMatch from '../pages/user/shoporder/ShopOrderMatch';
 
 export default function UserRoutes() {
@@ -70,6 +70,12 @@ export default function UserRoutes() {
       {/* 매장별 구독권 */}
       <Route path="order" element={<ShopOrder />} />
       <Route path="order/:sno/match" element={<ShopOrderMatch />} />
+      <Route path="order/:ono" element={<ShopOrderDetail />}>
+        <Route path="payment" element={<ShopPaymentList />} />
+        <Route path="history" element={<ShopOrderLog />} />
+      </Route>
+      <Route path="order/:ono/payment/:pno" element={<ShopPaymentDetail />} />
+      <Route path="order/:ono/payment/:pno/refund" element={<ShopRefundDetail />} />
 
 
       <Route path="shop" element={<ShopList />} />
