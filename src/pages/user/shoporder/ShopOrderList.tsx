@@ -29,10 +29,12 @@ import { usePaging } from '../../../hooks/usePaging';
 import RenewModal from './modal/RenewModal';
 import CancelModal from './modal/CancelModal';
 import ChangeModal from './modal/ChangeModal';
+import { GlobalCurrentShop } from '../../../store/UserStore';
 
 export default function ShopOrderList() {
   const navigate = useNavigate();
   const { no: mno } = GlobalStoreSession();
+  const { clearShop } = GlobalCurrentShop();
   const { page, setPage } = usePaging({ basePath: '/user/shoporder' });
 
   // 상세로 이동할 때 현재 목록 page를 listPage로 실어 보냄
@@ -51,6 +53,18 @@ export default function ShopOrderList() {
   /* 페이징 설정 */
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
+
+  
+  /* 구독상태 변경으로 스토리지 grade 재설정 */
+  const setGrade = async () => {
+    const getGrade = await axiosInstance.get(`/shop_order/grade/${mno}`)
+    const res = getGrade.data
+    GlobalStoreSession.getState().setGrade(res);
+
+    // 점주 아니면 상단 매장 리셋
+    if (res !== 10) clearShop();
+  }
+
 
   const loadList = async () => {
     if (!mno) {
@@ -142,9 +156,16 @@ export default function ShopOrderList() {
   const handleModalSuccess = (message: string) => {
     setAlert({ message, variant: 'success' });
     loadList();
+    setGrade();
   };
 
   console.log(activeCountsMap)
+
+  useEffect(() => {
+    setGrade();
+  }, [activeCountsMap])
+
+
 
 
   const columns: DataTableColumn<RowType>[] = [
