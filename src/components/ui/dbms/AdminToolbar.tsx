@@ -11,6 +11,7 @@ interface AdminToolbarProps {
   extra?: ReactNode;
   /** 검색어 입력창에서 Enter 입력 시 실행할 검색 함수 (예: onSearch) */
   onSearchEnter?: () => void;
+  width?: string;
 }
 
 /**
@@ -37,6 +38,7 @@ export default function AdminToolbar({
   filters,
   extra,
   onSearchEnter,
+  width
 }: AdminToolbarProps) {
   return (
     <div className="filter_bar">
@@ -58,6 +60,7 @@ export default function AdminToolbar({
               onSearchEnter?.();
             }
           }}
+          style={{width: width ?? width}}
         />
         {searchValue && (
           <button

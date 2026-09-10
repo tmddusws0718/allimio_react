@@ -45,6 +45,7 @@ import ShopOrder from '../pages/user/shop/ShopOrderList';
 import ShopOrderMatch from '../pages/user/shoporder/ShopOrderMatch';
 
 import Notification from '../pages/user/notification/Notification';
+import ShopOrderPendingnList from '../pages/user/shoporder/ShopOrderPendingList';
 
 export default function UserRoutes() {
   return (
@@ -69,6 +70,7 @@ export default function UserRoutes() {
       </Route>
       <Route path="shoporder/:ono/payment/:pno" element={<ShopPaymentDetail />} />
       <Route path="shoporder/:ono/payment/:pno/refund" element={<ShopRefundDetail />} />
+      <Route path="pending" element={<ShopOrderPendingnList />} />
 
       {/* 매장별 구독권 */}
       <Route path="order" element={<ShopOrder />} />

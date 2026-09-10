@@ -388,6 +388,9 @@
   font-weight: 600;
   font-family: var(--font-mono);
 }
+.order_line span:last-child.danger {
+  color:var(--danger);
+}
 .order_total {
   display: flex;
   justify-content: space-between;

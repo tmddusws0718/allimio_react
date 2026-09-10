@@ -1,6 +1,7 @@
 export interface ShopOrderTypes {
   no: string;
   mno: number;
+  id?: string;
   pno: number;
   sno: number | null;
   pmonth: number;

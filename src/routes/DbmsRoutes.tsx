@@ -36,8 +36,11 @@ import NoticeForm from '../pages/dbms/notice/NoticeForm';
 import AttachList from '../pages/dbms/attach/AttachList';
 import ShopPlanForm from '../pages/dbms/shopplan/ShopPlanForm';
 import ShopPlanList from '../pages/dbms/shopplan/ShopPlanList';
+import ShopOrderList from '../pages/dbms/shoporder/ShopOrderList';
 
 import NotificationAdmin from '../pages/dbms/notification/NotificationAdmin';
+import ShopOrderLogList from '../pages/dbms/shoporder/ShopOrderLogList';
+import ShopOrderPendingnList from '../pages/dbms/shoporder/ShopOrderPendingList';
 
 export default function DbmsRoutes() {
   return (
@@ -59,7 +62,9 @@ export default function DbmsRoutes() {
       <Route path="shopplan" element={<ShopPlanList />} />
       <Route path="shopplan/new" element={<ShopPlanForm />} />
       <Route path="shopplan/:no/edit" element={<ShopPlanForm />} />
-
+      <Route path="shoporder" element={<ShopOrderList />} />
+      <Route path="/order/history" element={<ShopOrderLogList />} />
+      <Route path="pending" element={<ShopOrderPendingnList />} />
 
       <Route path="inmenu" element={<InMenuList />} />
       <Route path="inmenu/new" element={<InMenuForm />} />

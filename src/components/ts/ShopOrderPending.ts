@@ -1,6 +1,7 @@
 export interface OrderPendingTypes {
   no: string;
   ono: string;
+  sno?: string;
   mno: number;
   pno: number;
   // sno: number | null;
@@ -16,10 +17,17 @@ export interface OrderPendingTypes {
 
   sname?: string;
   pname?: string;
+  oldCcnt?: number;
   minccnt?: number;
   maxccnt?: number;
 }
 
+
+export const STATUS_MAP: Record<number, { label: string; className: string }> = {
+  0: { label: '대기', className: 'info' },
+  1: { label: '반려', className: 'danger' },
+  2: { label: '완료', className: 'success' },
+};
 
 export type RowType = OrderPendingTypes & { cnt: number };
 

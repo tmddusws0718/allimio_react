@@ -88,6 +88,8 @@ export default function ShopOrderList() {
 
       const { content, totalElements: total, totalPages: pages, page: serverPage, size } = res.data;
 
+      console.log(res)
+
       if (content.length === 0 && page > 1) {
         setPage(page - 1);
         return;
@@ -213,7 +215,7 @@ export default function ShopOrderList() {
     },
     { header: '대수', width: '80px', mono: true, 
       render: (o) => 
-        o.status === 1 && o.pstatus != null ? ( // 승인대기 상태일 때
+        o.status === 1 && o.pstatus != null && o.pstatus === 0 ? ( // 승인대기 상태일 때
           <>
             <span style={{fontSize:11, color:'var(--danger)'}}>변경대기</span>
           </>
@@ -232,7 +234,11 @@ export default function ShopOrderList() {
         ) : <span className="cell_sub">-</span>
       ,
     },
-    { header: '결제금액(원)', width: '120px', mono: true, render: (o) => `${o.totalprice.toLocaleString('ko-KR')}` },
+    { header: '결제금액(원)', width: '120px', mono: true, 
+      render: (o) => (
+        <span className={o.status === 2 ? 'text_line' : ''}>{o.totalprice.toLocaleString('ko-KR')}</span>
+      )
+    },
     { header: '구매일', width: '120px', mono: true, render: (o) => o.cdate.split(' ')[0] },
     {
       header: '관리',

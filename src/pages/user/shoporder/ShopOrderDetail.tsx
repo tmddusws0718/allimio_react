@@ -118,7 +118,7 @@ export default function ShopOrderDetail() {
 
       <div className="tabs" role="tablist" aria-label="구독 내역 보기 전환">
         {(['info', 'payment', 'history'] as TabKey[]).map((tKey) => {
-          const labels: Record<TabKey, string> = { info: '상세 내역', payment: '결제 내역', history: '변경 이력' };
+          const labels: Record<TabKey, string> = { info: '상세 내역', payment: '결제 내역', history: '전체 이력' };
 
           return (
             <button

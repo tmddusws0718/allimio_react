@@ -245,6 +245,8 @@ select::-ms-expand {display:none;}
 .cell_title{font-weight:600;font-size:13px;color:var(--text);}
 .cell_sub{font-size:11px;color:var(--text-faint);margin-top:2px;}
 
+.text_line {text-decoration: line-through; color:var(--red-400);}
+
 
 .no_data {
   display: flex;

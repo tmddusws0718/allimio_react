@@ -1,44 +1,49 @@
-import { useParams } from "react-router-dom";
-import { GlobalStoreSession } from "../../../store/LoginStore";
-import { usePaging } from "../../../hooks/usePaging";
-import { useEffect, useState } from "react";
-import { EMPTY_FILTERS, formatLogAmount, LOG_ACTION_MAP, PAGE_SIZE, type Filters, type LogSearchResult, type RowType } from "../../../components/ts/ShopOrderLog";
-import { axiosInstance } from "../../../utils/Tool";
-import { DataTable, Filterbar, Modal, UserPagination, type DataTableColumn } from "../../../components/ui";
+import { useEffect, useState } from 'react';
+import { PageHeader, Filterbar, UserPagination, DataTable, type DataTableColumn, DbmsPagination, AdminToolbar, Modal } from '../../../components/ui';
+import { axiosInstance } from '../../../utils/Tool';
+import { EMPTY_FILTERS, formatLogAmount, LOG_ACTION_MAP, PAGE_SIZE, type Filters, type LogSearchResult, type RowType } from '../../../components/ts/ShopOrderLog';
+import { ORDER_STATUS_MAP } from '../../../components/ts/ShopOrder';
+import { usePaging } from '../../../hooks/usePaging';
+import { GlobalStoreSession } from '../../../store/LoginStore';
 
+/* ---------------------------------------------------------------------
+   전체 구독 변경이력 (관리자, /dbms/shop_order_log) — 전체 회원의
+   결제/매장연결/갱신/취소/변경신청/변경확정 이벤트를 검색+페이징으로 조회합니다.
 
-export default function ShopOrderLog() {
-  const { no: mno } = GlobalStoreSession();
-  const { ono } = useParams<{ ono: string }>();
-  const url = location.pathname.includes('/order') ? 'order' : 'shoporder';
+   API
+   GET /shop_order_log/list/admin?word=&action=&dateFrom=&dateTo=&page=&size=
+--------------------------------------------------------------------- */
 
-  const { page, setPage, navigateWithQuery } = usePaging({ basePath: `/user/${url}/${ono}/history` });
-
+export default function ShopOrderLogList() {
+  const { no: ano } = GlobalStoreSession();
   const [logs, setLogs] = useState<RowType[]>([]);
-  const [detailTarget, setDetailTarget] = useState<RowType | null>(null);
   const [loading, setLoading] = useState(true);
+  const { page, setPage } = usePaging({ basePath: '/dbms/order/history' });
+  const [detailTarget, setDetailTarget] = useState<RowType | null>(null);
 
+  /* 필터바 설정 */
   const [draft, setDraft] = useState<Filters>(EMPTY_FILTERS);
   const [applied, setApplied] = useState<Filters>(EMPTY_FILTERS);
 
-  const [totalPages, setTotalPages] = useState<number>(1);
+  /* 페이징 설정 */
+  const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
 
-  const loadLogs = async () => {
-    if (!ono) return;
+  const loadList = async () => {
     setLoading(true);
-
+    
     try {
-      const res = await axiosInstance.get<LogSearchResult>(`/shop_order_log/list/${mno}/${ono}`, {
+      const res = await axiosInstance.get<LogSearchResult>('/shop_order_log/list/admin', {
         params: {
-          page: page - 1,
-          size: PAGE_SIZE,
+          word: applied.word.trim() || undefined,
           action: applied.action === '' ? undefined : Number(applied.action),
           dateFrom: applied.dateFrom || undefined,
           dateTo: applied.dateTo || undefined,
+          page: page - 1,
+          size: PAGE_SIZE,
         },
       });
-
+      
       const { content, totalElements: total, totalPages: pages, page: serverPage, size } = res.data;
 
       if (content.length === 0 && page > 1) {
@@ -56,19 +61,19 @@ export default function ShopOrderLog() {
       setTotalPages(Math.max(1, pages));
 
     } catch (error) {
-      console.error('결제 내역 조회 실패:', error);
-      setLogs([]);
-      setTotalElements(0);
-      setTotalPages(1);
+        console.error('변경이력 목록 조회 실패:', error);
+        setLogs([]);
+        setTotalElements(0);
+        setTotalPages(1);
+
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadLogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mno, ono, applied, page]);
+    loadList();
+  }, [ano, applied, page]);
 
   const onSearch = () => {
     setPage(1);
@@ -91,11 +96,16 @@ export default function ShopOrderLog() {
     {
       header: '구분',
       width: '90px',
-      render: (l) => (
-        <span className={`badge ${LOG_ACTION_MAP[l.action].className}`}>{LOG_ACTION_MAP[l.action].label}</span>
-      ),
+      render: (l) => <span className={`badge ${LOG_ACTION_MAP[l.action].className}`}>{LOG_ACTION_MAP[l.action].label}</span>,
     },
-    { header: '발생일시', width: '190px', mono: true, render: (l) => l.cdate },
+    { header: '회원정보', width: '120px', mono: true, 
+      render: (l) => (
+        <>
+          <div className='cell_sub'>No.{l.mno}</div>
+          <div className='cell_title'>{l.id}</div>
+        </>
+      )
+    },
     {
       header: '구독정보',
       width: '120px',
@@ -107,16 +117,7 @@ export default function ShopOrderLog() {
       ),
     },
     { header: '내용', width:'30%', render: (l) => l.memo ? <span className='ellipsis' >{l.memo}</span> : <span className="cell_sub">-</span> },
-    {
-      header: '금액(원)',
-      width: '110px',
-      mono: true,
-      render: (l) => {
-        const formatted = formatLogAmount(l.amount, l.action, l.memo);
-        if (!formatted) return <span className="cell_sub">-</span>;
-        return <span className={formatted.className}>{formatted.text}</span>;
-      },
-    },
+    { header: '발생일시', width: '180px', mono: true, render: (l) => l.cdate },
     {
       header: '상세',
       width: '100px',
@@ -127,14 +128,18 @@ export default function ShopOrderLog() {
       ),
     },
   ];
-
+  console.log(logs)
 
   return (
-    <>
-      <Filterbar
-        page={page}
-        pageSize={PAGE_SIZE}
-        totalCount={totalElements}
+    <section className="view active">
+      <PageHeader title="전체 구독 변경이력" description="전체 회원의 결제·매장연결·갱신·취소·변경 이벤트를 확인합니다." />
+
+      <AdminToolbar
+        width='250px'
+        searchValue={draft.word}
+        onSearchChange={(value) => setDraft((prev) => ({ ...prev, word: value }))}
+        onSearchEnter={onSearch}
+        searchPlaceholder="회원정보 · 매장명 · 내용"
         filters={
           <>
             <select
@@ -151,16 +156,12 @@ export default function ShopOrderLog() {
               ))}
             </select>
 
-
             <input
               type="date"
               className="form_input"
               value={draft.dateFrom}
               onChange={(e) => setDraft((prev) => ({ ...prev, dateFrom: e.target.value }))}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') onSearch();
-              }}
-              aria-label="기록일 시작"
+              aria-label="발생일 시작"
             />
             <span style={{ alignSelf: 'center' }}>~</span>
             <input
@@ -168,10 +169,7 @@ export default function ShopOrderLog() {
               className="form_input"
               value={draft.dateTo}
               onChange={(e) => setDraft((prev) => ({ ...prev, dateTo: e.target.value }))}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') onSearch();
-              }}
-              aria-label="기록일 종료"
+              aria-label="발생일 종료"
             />
           </>
         }
@@ -192,12 +190,17 @@ export default function ShopOrderLog() {
         data={logs}
         rowKey={(l) => l.no}
         loading={loading}
-        emptyMessage="조건에 맞는 변경 이력이 없습니다."
+        emptyMessage="변경 이력이 없습니다."
       />
 
-      <UserPagination page={page} totalPages={totalPages} totalCount={totalElements} pageSize={PAGE_SIZE} onChange={setPage} />
+      <DbmsPagination
+        page={page}
+        totalPages={totalPages}
+        totalCount={totalElements}
+        pageSize={PAGE_SIZE}
+        onChange={setPage}
+      />
 
-      
       <Modal
         open={detailTarget !== null}
         onClose={() => setDetailTarget(null)}
@@ -218,6 +221,14 @@ export default function ShopOrderLog() {
               </span>
             </div>
             
+            <div className="order_line">
+              <span>회원정보</span>
+              <span>
+                <span className='cell_sub'>(No.{detailTarget.mno}) </span>
+                <span>{detailTarget.id}</span>
+              </span>
+            </div>
+
             <div className="order_line"><span>주문번호</span><span className="mono">{detailTarget.ono}</span></div>
 
             
@@ -295,6 +306,7 @@ export default function ShopOrderLog() {
           </div>
         )}
       </Modal>
-    </>
+      
+    </section>
   );
 }

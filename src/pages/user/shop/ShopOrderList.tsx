@@ -183,7 +183,8 @@ export default function ShopOrderBySno() {
     },
     { header: '기간', width: '80px', mono: true, render: (o) => `${o.pmonth}개월` },
     { header: '대수', width: '60px', mono: true, render: (o) => `${o.ccnt}대` },
-    { header: '결제금액', width: '110px', mono: true, render: (o) => `${o.totalprice.toLocaleString('ko-KR')}원` },
+    { header: '결제금액', width: '110px', mono: true, render: (o) => 
+        <span className={o.status === 2 ? 'text_line' : ''}>{o.totalprice.toLocaleString('ko-KR')}</span> },
     {
       header: '구독기간',
       width: '180px',
