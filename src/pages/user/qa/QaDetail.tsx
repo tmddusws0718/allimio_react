@@ -197,8 +197,14 @@ export default function QaDetail() {
               )}
             </h3>
             <p className="b_title">
-              <span>작성자 {qa.id}(No.{qa.mno})</span>
-              <span className="right">{qa.cdate}</span>
+              <span>작성자 : 
+                {qa.mno !== null ? (
+                  ` ${qa.id} (No.${qa.mno})`
+                ):(' 비회원')}
+              </span>
+              <span className="right">
+                {qa.cdate} | 조회수 {qa.vcnt}
+              </span>
             </p>
           </div>
 

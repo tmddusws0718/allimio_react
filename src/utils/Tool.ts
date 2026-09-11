@@ -3,7 +3,7 @@ import { useEffect, type KeyboardEvent } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const getIP = () => {
-  return "10.1.205.118"; // 학원
+  return "10.1.205.126"; // 학원
   // return "1.201.122.84"; // 가비아
 }
 

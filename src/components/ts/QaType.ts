@@ -38,6 +38,7 @@ export interface QaTypes {
 
   isfaq: string;
   fileyn: string;
+  vcnt: number;
 }
 
 

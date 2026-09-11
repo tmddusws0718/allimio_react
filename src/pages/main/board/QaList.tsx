@@ -178,38 +178,40 @@ export default function QaList() {
     {
       header: '제목 및 정보',
       render: (n) => (
-        <div className="lt">
-          <div className="cell_title">
-            <button type="button" className="link" onClick={() => handleClickItem(n)}>
-              {n.title}
-              {n.vmode === 'Y' && (
-                <span className="lock">
-                  <span className="hidden">비밀글</span>
-                </span>
-              )}
-            </button>
-          </div>
-          <div className="cell_sub">
-            접수유형: {Object.entries(QA_TYPE_MAP).find(([type]) => Number(type) === n.type)?.[1].label ?? n.type} · {n.cdate?.split(' ')[0]}
-          </div>
-        </div>
-      ),
-    },
-    {
-      header: '첨부파일 정보',
-      render: (n) => {
-        if (n.fileyn !== 'Y') return null;
-
-        return (
-          <div className="me">
-            <div className="icon_row">
-              <div className="icon file">
-                <span className="hidden">첨부파일 포함</span>
-              </div>
+        <>
+          <div className="lt">
+            <div className="cell_title">
+              <button type="button" className="link" onClick={() => handleClickItem(n)}>
+                {n.title}
+                {n.vmode === 'Y' && (
+                  <span className="lock">
+                    <span className="hidden">비밀글</span>
+                  </span>
+                )}
+              </button>
+            </div>
+            <div className="cell_sub">
+              접수유형: {Object.entries(QA_TYPE_MAP).find(([type]) => Number(type) === n.type)?.[1].label ?? n.type} · {n.cdate?.split(' ')[0]}
             </div>
           </div>
-        );
-      },
+          
+          {n.fileyn !== 'Y' && (
+            <div className="me">
+              <div className='icon_row'>
+                <div className='icon file'>
+                  <span className='hidden'>첨부파일 포함</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className='me'>
+            <div className="cell_sub">
+              조회수 {n.vcnt}
+            </div>
+          </div>
+        </>
+      ),
     },
   ];
 

@@ -19,12 +19,9 @@ export default function QaForm() {
   const { no } = useParams<{ no: string }>(); // URL에 no가 있으면 수정 모드
   const { no: mno, grade } = GlobalStoreSession();
   const isEdit = Boolean(no);
-  const [member, setMember] = useState<MyMemberInfo | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [alert, setAlert] = useState<{ message: string; variant?: 'success' | 'error'; onConfirm?: () => void } | null>(null);
 
-
-  
   /* 첨부파일 변경확인 */
   const attachRef = useRef<AttachUploaderHandle>(null);
 
@@ -42,8 +39,6 @@ export default function QaForm() {
       goToList();
     }
   };
-
-
 
   const [input, setInput] = useState<QCRequest>({
     mno: mno,
@@ -88,16 +83,6 @@ export default function QaForm() {
     
   }, [isEdit, no]);
 
-  useEffect(() => {
-    if (!mno && mno === 0) return;
-    
-    axiosInstance.get(`/v1/user/find/${mno}`)
-      .then((res) => res.data)
-      .then((data) => {
-        setMember(data)
-      })
-      .catch((err) => console.error('회원정보 조회 실패', err))
-    }, [mno]);
 
   // 입력 필드 변경
   const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -134,6 +119,10 @@ export default function QaForm() {
     let firstErrorId: string | null = null;
 
     for (const { field, label, id } of REQUIRED_FIELDS) {
+      if (field === 'guestEmail' && mno !== 0) {
+        continue;
+      }
+
       if (!String(input[field] ?? '').trim()) {
         newErrors[field] = `${label}을(를) 입력해주세요.`;
         if (!firstErrorId) firstErrorId = id;
@@ -158,7 +147,7 @@ export default function QaForm() {
     setSubmitting(true);
     try {
       const payload: QCRequest = {
-        mno: mno === 0 ? null : mno,
+        mno: mno,
         type: Number(input.type),
         title: input.title,
         content: input.content,
@@ -268,42 +257,26 @@ export default function QaForm() {
             </div>
           </div>
 
-          {/* 작성자 ID (읽기 전용) */}
-          <div className="form_group">
-            <label className="form_label" htmlFor="user_id">
-              작성자 ID
-            </label>
-            <div className="form_control">
-              <input
-                type="text"
-                id="user_id"
-                name="ano"
-                className="form_input"
-                value={`${member?.id || '비회원'} (No.${mno})`}
-                readOnly
-                style={{ maxWidth: 200 }}
-              />
+          {/* 이메일 (비회원용) */}
+          {(mno == null || mno == 0) &&(
+            <div className="form_group">
+              <label className="form_label" htmlFor="guestEmail">
+                이메일<span className="req" title="필수 입력 요소">*</span>
+              </label>
+              <div className="form_control">
+                <input
+                  type="text"
+                  id="guestEmail"
+                  className={`form_input ${errors.guestEmail ? 'is_error' : ''}`}
+                  placeholder="이메일을 입력하세요"
+                  name="guestEmail"
+                  value={input.guestEmail}
+                  onChange={onChange}
+                />
+                {errors.guestEmail && <div className="form_hint error">{errors.guestEmail}</div>}
+              </div>
             </div>
-          </div>
-
-          {/* 이메일 */}
-          <div className="form_group">
-            <label className="form_label" htmlFor="guestEmail">
-              이메일<span className="req" title="필수 입력 요소">*</span>
-            </label>
-            <div className="form_control">
-              <input
-                type="text"
-                id="guestEmail"
-                className={`form_input ${errors.guestEmail ? 'is_error' : ''}`}
-                placeholder="이메일을 입력하세요"
-                name="guestEmail"
-                value={mno !== 0 ? member?.email : input.guestEmail}
-                onChange={onChange}
-              />
-              {errors.guestEmail && <div className="form_hint error">{errors.guestEmail}</div>}
-            </div>
-          </div>
+          )}
 
           {/* 문의 제목 */}
           <div className="form_group">
